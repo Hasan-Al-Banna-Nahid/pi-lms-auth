@@ -1,0 +1,8 @@
+model Company {
+    id        String   @id @default(uuid())
+    name      String
+    domain    String   @unique
+    ownerId   String   @unique
+    users     User[]
+    createdAt DateTime @default(now())
+}

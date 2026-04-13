@@ -1,0 +1,23 @@
+model User {
+    id           String   @id @default(uuid())
+    email        String   @unique
+    passwordHash String
+    name         String
+    role         UserRole @default(STUDENT)
+
+    // Multi-tenancy
+    companyId          String?
+    company            Company?  @relation(fields: [companyId], references: [id])
+    otpCode            String?
+    otpExpires         DateTime?
+    // Security & Auth
+    isTwoFactorEnabled Boolean   @default(false)
+    twoFactorSecret    String?
+    refreshToken       String? // Hashed refresh token
+
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    isVerified Boolean  @default(false)
+
+    @@index([email, companyId])
+}
