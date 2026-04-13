@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums"
+import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model User
@@ -255,6 +255,7 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   isVerified?: Prisma.BoolFilter<"User"> | boolean
   company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
+  devices?: Prisma.DeviceListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -273,6 +274,7 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   company?: Prisma.CompanyOrderByWithRelationInput
+  devices?: Prisma.DeviceOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -294,6 +296,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   isVerified?: Prisma.BoolFilter<"User"> | boolean
   company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
+  devices?: Prisma.DeviceListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -351,6 +354,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   isVerified?: boolean
   company?: Prisma.CompanyCreateNestedOneWithoutUsersInput
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -368,6 +372,7 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isVerified?: boolean
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -385,6 +390,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   company?: Prisma.CompanyUpdateOneWithoutUsersNestedInput
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -402,6 +408,7 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -462,6 +469,11 @@ export type UserListRelationFilter = {
 
 export type UserOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type UserScalarRelationFilter = {
+  is?: Prisma.UserWhereInput
+  isNot?: Prisma.UserWhereInput
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -557,6 +569,20 @@ export type UserUncheckedUpdateManyWithoutCompanyNestedInput = {
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
+export type UserCreateNestedOneWithoutDevicesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDevicesInput, Prisma.UserUncheckedCreateWithoutDevicesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDevicesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDevicesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDevicesInput, Prisma.UserUncheckedCreateWithoutDevicesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDevicesInput
+  upsert?: Prisma.UserUpsertWithoutDevicesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDevicesInput, Prisma.UserUpdateWithoutDevicesInput>, Prisma.UserUncheckedUpdateWithoutDevicesInput>
+}
+
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
 }
@@ -587,6 +613,7 @@ export type UserCreateWithoutCompanyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isVerified?: boolean
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCompanyInput = {
@@ -603,6 +630,7 @@ export type UserUncheckedCreateWithoutCompanyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isVerified?: boolean
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCompanyInput = {
@@ -651,6 +679,90 @@ export type UserScalarWhereInput = {
   isVerified?: Prisma.BoolFilter<"User"> | boolean
 }
 
+export type UserCreateWithoutDevicesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  role?: $Enums.UserRole
+  otpCode?: string | null
+  otpExpires?: Date | string | null
+  isTwoFactorEnabled?: boolean
+  twoFactorSecret?: string | null
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isVerified?: boolean
+  company?: Prisma.CompanyCreateNestedOneWithoutUsersInput
+}
+
+export type UserUncheckedCreateWithoutDevicesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  role?: $Enums.UserRole
+  companyId?: string | null
+  otpCode?: string | null
+  otpExpires?: Date | string | null
+  isTwoFactorEnabled?: boolean
+  twoFactorSecret?: string | null
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isVerified?: boolean
+}
+
+export type UserCreateOrConnectWithoutDevicesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDevicesInput, Prisma.UserUncheckedCreateWithoutDevicesInput>
+}
+
+export type UserUpsertWithoutDevicesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDevicesInput, Prisma.UserUncheckedUpdateWithoutDevicesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDevicesInput, Prisma.UserUncheckedCreateWithoutDevicesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDevicesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDevicesInput, Prisma.UserUncheckedUpdateWithoutDevicesInput>
+}
+
+export type UserUpdateWithoutDevicesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  otpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  otpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  company?: Prisma.CompanyUpdateOneWithoutUsersNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDevicesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  otpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  otpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+}
+
 export type UserCreateManyCompanyInput = {
   id?: string
   email: string
@@ -681,6 +793,7 @@ export type UserUpdateWithoutCompanyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCompanyInput = {
@@ -697,6 +810,7 @@ export type UserUncheckedUpdateWithoutCompanyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutCompanyInput = {
@@ -716,6 +830,35 @@ export type UserUncheckedUpdateManyWithoutCompanyInput = {
 }
 
 
+/**
+ * Count Type UserCountOutputType
+ */
+
+export type UserCountOutputType = {
+  devices: number
+}
+
+export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  devices?: boolean | UserCountOutputTypeCountDevicesArgs
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserCountOutputType
+   */
+  select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeviceWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -733,6 +876,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   isVerified?: boolean
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
+  devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -791,6 +936,8 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "role" | "companyId" | "otpCode" | "otpExpires" | "isTwoFactorEnabled" | "twoFactorSecret" | "refreshToken" | "createdAt" | "updatedAt" | "isVerified", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
+  devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
@@ -803,6 +950,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     company: Prisma.$CompanyPayload<ExtArgs> | null
+    devices: Prisma.$DevicePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1214,6 +1362,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   company<T extends Prisma.User$companyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$companyArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  devices<T extends Prisma.User$devicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1674,6 +1823,30 @@ export type User$companyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   include?: Prisma.CompanyInclude<ExtArgs> | null
   where?: Prisma.CompanyWhereInput
+}
+
+/**
+ * User.devices
+ */
+export type User$devicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Device
+   */
+  select?: Prisma.DeviceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Device
+   */
+  omit?: Prisma.DeviceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeviceInclude<ExtArgs> | null
+  where?: Prisma.DeviceWhereInput
+  orderBy?: Prisma.DeviceOrderByWithRelationInput | Prisma.DeviceOrderByWithRelationInput[]
+  cursor?: Prisma.DeviceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeviceScalarFieldEnum | Prisma.DeviceScalarFieldEnum[]
 }
 
 /**

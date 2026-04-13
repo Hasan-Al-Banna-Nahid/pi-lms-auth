@@ -45,10 +45,37 @@ export class AuthService {
   }
 
   async registerStudent(dto: any, domain: string) {
-    const user = await this.repo.findUserByEmail(dto.email);
-    if (user) throw new ConflictException('User already registered');
+    // ১. ডোমেইন থেকে কোম্পানি খুঁজে বের করা
+    const company = await this.repo.findCompanyByDomain(domain);
+    if (!company)
+      throw new BadRequestException('Invalid domain or organization');
 
-    return this.repo.createUser({ ...dto, domain }, false);
+    // ২. ইমেইল অলরেডি আছে কি না চেক
+    const existingUser = await this.repo.findUserByEmail(dto.email);
+    if (existingUser) throw new ConflictException('Email already taken');
+
+    // ৩. OTP জেনারেট করা
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // ৪. কিউতে পাঠানো (ইমেইল ভেরিফিকেশন এবং ইউজার ক্রিয়েশনের জন্য)
+    await this.authQueue.add(
+      'register-user',
+      {
+        ...dto,
+        otp,
+        companyId: company.id, // এখানে কোম্পানি আইডি কানেক্ট করা হচ্ছে
+        isOwner: false,
+        role: 'STUDENT',
+        isVerified: false, // শুরুতে আনভেরিফাইড থাকবে
+      },
+      { attempts: 3, backoff: 5000 },
+    );
+
+    return {
+      success: true,
+      message:
+        'Verification email sent. Please verify your account to continue.',
+    };
   }
   async createStaff(dto: any, creator: any) {
     if (!['SUPER_ADMIN', 'ADMIN'].includes(creator.role)) {
@@ -140,38 +167,73 @@ export class AuthService {
     };
   }
 
-  async login(dto: LoginDto) {
-    const user = await this.repo.findUserByEmail(dto.email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+  // auth.service.ts ভেতরে
 
+  async login(dto: LoginDto, deviceId: string) {
+    // ইমেইলকে লোয়ারকেস করা
+    const email = dto.email.toLowerCase().trim();
+
+    const user = await this.repo.findUserByEmail(email);
+
+    if (!user) {
+      console.log(`User not found: ${email}`);
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // পাসওয়ার্ড চেক করার আগে লগ দিন (শুধু ডিবাগিংয়ের জন্য)
     const isMatch = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!isMatch) throw new UnauthorizedException('Invalid credentials');
 
-    return this.generateTokens(user);
+    if (!isMatch) {
+      console.log(`Password mismatch for: ${email}`);
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // ডিভাইস লিমিট চেক
+    await this.repo.upsertDevice(user.id, deviceId);
+    return this.generateTokens(user, deviceId);
   }
 
-  private async generateTokens(user: any) {
+  async logout(userId: string, deviceId: string, logoutAll: boolean = false) {
+    if (logoutAll) {
+      await this.repo.removeAllDevices(userId);
+    } else {
+      try {
+        await this.repo.removeDevice(userId, deviceId);
+      } catch (e) {
+        throw new BadRequestException('Device already logged out or not found');
+      }
+    }
+    return { success: true, message: 'Logout successful' };
+  }
+
+  private async generateTokens(user: any, deviceId: string) {
     const payload = {
       sub: user.id,
       email: user.email,
       role: user.role,
       cid: user.companyId,
+      did: deviceId, // ডিভাইস আইডি পে-লোডে রাখুন
     };
 
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
-    await this.repo.updateRefreshToken(
-      user.id,
-      await bcrypt.hash(refreshToken, 10),
-    );
+    // রিফ্রেশ টোকেন হ্যাশ করে সেভ করা (সিকিউরিটির জন্য)
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.repo.updateRefreshToken(user.id, hashedRefreshToken);
 
     return {
       success: true,
-      message: 'Authentication successful',
       accessToken,
       refreshToken,
-      user: { id: user.id, name: user.name, role: user.role },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        companyId: user.companyId,
+        isVerified: user.isVerified,
+      },
     };
   }
 }

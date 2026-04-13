@@ -11,7 +11,7 @@ import { BullModule } from '@nestjs/bullmq';
     PrismaModule,
     BullModule.forRoot({
       connection: {
-        host: 'pi-lms-auth-wydufe.serverless.use1.cache.amazonaws.com',
+        host: 'localhost',
         port: 6379,
       },
     }),

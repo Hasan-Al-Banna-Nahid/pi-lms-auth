@@ -1,0 +1,9 @@
+model Device {
+    id        String   @id @default(uuid())
+    deviceId  String // ব্রাউজার থেকে পাঠানো ইউনিক আইডি
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+    lastLogin DateTime @default(now())
+
+    @@unique([userId, deviceId]) // একই ইউজারের জন্য ডিভাইস আইডি ইউনিক হবে
+}

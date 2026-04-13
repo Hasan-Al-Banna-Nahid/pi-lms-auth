@@ -15,30 +15,34 @@ export class AuthProcessor extends WorkerHost {
 
   async process(job: Job<any, any, string>): Promise<any> {
     if (job.name === 'register-user') {
-      const { email, password, name, domain, otp, isOwner } = job.data;
+      const { email, password, name, domain, otp, isOwner, role, companyId } =
+        job.data;
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      // ডাটাবেজে ইউজার তৈরি
       const user = await this.repo.createUser(
         {
           email,
           password: hashedPassword,
           name,
-          domain,
+          role: role || (isOwner ? 'SUPER_ADMIN' : 'STUDENT'),
+          companyId: companyId || null,
           otpCode: otp,
-          otpExpires: new Date(Date.now() + 10 * 60000),
+          otpExpires: new Date(Date.now() + 10 * 60000), // ১০ মিনিট মেয়াদ
+          isVerified: false,
         },
-        isOwner, // !!domain এর বদলে সরাসরি isOwner ব্যবহার করুন
+        isOwner,
       );
 
-      // ইমেইল পাঠানোর আগে কনসোল লগ দিয়ে চেক করুন
-      console.log(`Sending email to: ${user.email} with OTP: ${otp}`);
+      console.log(`Sending OTP to ${user.email}: ${otp}`);
 
       try {
+        // ইমেইল পাঠানো
         await this.mailService.sendOtpEmail(user.email, otp);
       } catch (error) {
         console.error('Mail sending failed:', error);
-        throw error; // throw করলে BullMQ এটাকে 'failed' হিসেবে দেখাবে এবং পুনরায় চেষ্টা করবে
+        throw error;
       }
 
       return { status: 'completed', userId: user.id };
